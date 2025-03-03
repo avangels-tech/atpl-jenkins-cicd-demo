@@ -16,9 +16,9 @@ pipeline {
         }
         stage('Build and Push Docker Image') {
             steps {
-                sh 'docker build -t avangels-tech/k8s-jenkins-demo:${BUILD_NUMBER} .'
+                sh 'docker build -t avangelstech/k8s-jenkins-demo:${BUILD_NUMBER} .'
                 sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
-                sh 'docker push avangels-tech/k8s-jenkins-demo:${BUILD_NUMBER}'
+                sh 'docker push avangelstech/k8s-jenkins-demo:${BUILD_NUMBER}'
             }
         }
         stage('Deploy to Kubernetes') {
