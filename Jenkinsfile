@@ -11,7 +11,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git url: 'https://github.com/avangels-tech/k8s-jenkins-cicd-demo.git', branch: 'main'
+                git url: 'https://github.com/avangels-tech/atpl-jenkins-cicd-demo.git', branch: 'main'
             }
         }
         stage('Build and Push Docker Image') {
