@@ -25,9 +25,10 @@ pipeline {
         stage('Deploy to Kubernetes') {
             steps {
                 container('kubectl') {
-                    sh 'whoami'  // Check user
-                    sh 'ls -ld /home/jenkins/agent/workspace'  // Check directory permissions
-                    sh 'ls -la /home/jenkins/agent/workspace/k8s-cicd-demo@tmp'  // Check tmp dir
+                    sh 'whoami'  // Check running user
+                    sh 'ls -ld /home/jenkins/agent/workspace'  // Check workspace dir permissions
+                    sh 'ls -la /home/jenkins/agent/workspace/k8s-cicd-demo@tmp || echo "Tmp dir not found"'  // Check tmp dir
+                    sh 'mkdir -p /home/jenkins/agent/workspace/k8s-cicd-demo@tmp/test && touch /home/jenkins/agent/workspace/k8s-cicd-demo@tmp/test/testfile || echo "Cannot write to tmp"'  // Test write
                     sh 'cp /var/jenkins_home/.kube/config ~/.kube/config || echo "Using cluster default config"'
                     sh 'ls -la'
                     sh 'cat k8s-deployment.yaml || echo "File not found"'
