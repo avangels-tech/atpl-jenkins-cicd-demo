@@ -5,9 +5,6 @@ pipeline {
             defaultContainer 'build-tools'
         }
     }
-    environment {
-        DOCKERHUB_CREDENTIALS = credentials('dockerhub-credentials')
-    }
     stages {
         stage('Checkout') {
             steps {
@@ -16,10 +13,12 @@ pipeline {
         }
         stage('Build and Push Docker Image') {
             steps {
-                container('docker') {
-                    sh 'docker build -t avangelstech/k8s-jenkins-demo:${BUILD_NUMBER} .'
-                    sh 'echo "$DOCKERHUB_CREDENTIALS_PSW" | docker login -u "$DOCKERHUB_CREDENTIALS_USR" --password-stdin'
-                    sh 'docker push avangelstech/k8s-jenkins-demo:${BUILD_NUMBER}'
+                withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                    container('docker') {
+                        sh 'docker build -t avangelstech/k8s-jenkins-demo:${BUILD_NUMBER} .'
+                        sh 'echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin'
+                        sh 'docker push avangelstech/k8s-jenkins-demo:${BUILD_NUMBER}'
+                    }
                 }
             }
         }
