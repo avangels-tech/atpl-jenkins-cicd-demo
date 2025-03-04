@@ -11,14 +11,11 @@ pipeline {
                 git url: 'https://github.com/avangels-tech/atpl-jenkins-cicd-demo.git', branch: 'main'
             }
         }
-
         stage('Debug Credentials') {
             steps {
-                script {
-                    def creds = Jenkins.instance.getAllItems(com.cloudbees.plugins.credentials.Credentials)
-                    creds.each { cred ->
-                        println "ID: ${cred.id}, Type: ${cred.class}"
-                    }
+                withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                    sh 'echo "Username: $DOCKER_USERNAME"'
+                    sh 'echo "Password (base64): $(echo $DOCKER_PASSWORD | base64)"'
                 }
             }
         }
