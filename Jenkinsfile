@@ -11,14 +11,6 @@ pipeline {
                 git url: 'https://github.com/avangels-tech/atpl-jenkins-cicd-demo.git', branch: 'main'
             }
         }
-        stage('Debug Credentials') {
-            steps {
-                withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
-                    sh 'echo "Username: $DOCKER_USERNAME"'
-                    sh 'echo "Password (base64): $(echo $DOCKER_PASSWORD | base64)"'
-                }
-            }
-        }
         stage('Build and Push Docker Image') {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
@@ -33,6 +25,9 @@ pipeline {
         stage('Deploy to Kubernetes') {
             steps {
                 container('kubectl') {
+                    sh 'ls -la'  // Check directory contents
+                    sh 'cat k8s-deployment.yaml || echo "File not found"'  // Verify file presence
+                    sh 'kubectl version --client'  // Verify kubectl works
                     sh 'sed -i "s/latest/${BUILD_NUMBER}/g" k8s-deployment.yaml'
                     sh 'kubectl apply -f k8s-deployment.yaml'
                 }
