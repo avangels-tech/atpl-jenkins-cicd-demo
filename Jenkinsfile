@@ -25,6 +25,7 @@ pipeline {
         stage('Deploy to Kubernetes') {
             steps {
                 container('kubectl') {
+                    sh 'chmod -R 777 /home/jenkins/agent/workspace || echo "Permission fix failed"'
                     sh 'whoami'  // Check running user
                     sh 'ls -ld /home/jenkins/agent/workspace'  // Check workspace dir permissions
                     sh 'ls -la /home/jenkins/agent/workspace/k8s-cicd-demo@tmp || echo "Tmp dir not found"'  // Check tmp dir
