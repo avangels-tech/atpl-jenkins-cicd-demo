@@ -25,9 +25,13 @@ pipeline {
         stage('Deploy to Kubernetes') {
             steps {
                 container('kubectl') {
-                    sh 'ls -la'  // Check directory contents
-                    sh 'cat k8s-deployment.yaml || echo "File not found"'  // Verify file presence
-                    sh 'kubectl version --client'  // Verify kubectl works
+                    sh 'whoami'  // Check user
+                    sh 'ls -ld /home/jenkins/agent/workspace'  // Check directory permissions
+                    sh 'ls -la /home/jenkins/agent/workspace/k8s-cicd-demo@tmp'  // Check tmp dir
+                    sh 'cp /var/jenkins_home/.kube/config ~/.kube/config || echo "Using cluster default config"'
+                    sh 'ls -la'
+                    sh 'cat k8s-deployment.yaml || echo "File not found"'
+                    sh 'kubectl version --client'
                     sh 'sed -i "s/latest/${BUILD_NUMBER}/g" k8s-deployment.yaml'
                     sh 'kubectl apply -f k8s-deployment.yaml'
                 }
