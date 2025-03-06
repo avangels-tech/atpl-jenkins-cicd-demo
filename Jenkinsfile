@@ -15,6 +15,12 @@ pipeline {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
                     container('docker') {
+                        sh 'whoami'  // Should resolve to prok8adm (UID 1000)
+                        sh 'id'  // Should show uid=1000 gid=994
+                        sh 'ls -ld /'
+                        sh 'ls -ld /root'
+                        sh 'ls -l /var/run/docker.sock'
+                        sh 'docker ps || echo "Docker access failed"'
                         sh 'docker build -t avangelstech/k8s-jenkins-demo:${BUILD_NUMBER} .'
                         sh 'echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin'
                         sh 'docker push avangelstech/k8s-jenkins-demo:${BUILD_NUMBER}'
@@ -26,10 +32,6 @@ pipeline {
             steps {
                 container('kubectl') {
                     sh 'chmod -R 777 /home/jenkins/agent/workspace || echo "Permission fix failed"'
-                    sh 'whoami'  // Check running user
-                    sh 'ls -ld /home/jenkins/agent/workspace'  // Check workspace dir permissions
-                    sh 'ls -la /home/jenkins/agent/workspace/k8s-cicd-demo@tmp || echo "Tmp dir not found"'  // Check tmp dir
-                    sh 'mkdir -p /home/jenkins/agent/workspace/k8s-cicd-demo@tmp/test && touch /home/jenkins/agent/workspace/k8s-cicd-demo@tmp/test/testfile || echo "Cannot write to tmp"'  // Test write
                     sh 'cp /var/jenkins_home/.kube/config ~/.kube/config || echo "Using cluster default config"'
                     sh 'ls -la'
                     sh 'cat k8s-deployment.yaml || echo "File not found"'
